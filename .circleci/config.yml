@@ -21,7 +21,7 @@ jobs:
           command: |
             pip install pytest-playwright allure-pytest
             playwright install chromium
-            sudo npm install -g allure-commandline --unsafe-perm=true
+            brew install allure
 
       - run:
           name: Run Playwright Tests
