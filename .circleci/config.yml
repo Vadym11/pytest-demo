@@ -8,6 +8,7 @@ jobs:
   run-playwright-tests:
     machine:
       image: ubuntu-2204:2023.07.2
+      resource_class: medium
 
     steps:
       - checkout
