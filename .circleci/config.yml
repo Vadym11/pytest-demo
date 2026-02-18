@@ -30,7 +30,10 @@ jobs:
       - run:
           name: Run Playwright Tests
           command: |
-            pytest --alluredir=allure-results --tracing=retain-on-failure
+            pytest --alluredir=allure-results \
+                   --screenshot=only-on-failure \
+                   --video=retain-on-failure \
+                   --tracing=retain-on-failure
           when: always
 
       - run:
