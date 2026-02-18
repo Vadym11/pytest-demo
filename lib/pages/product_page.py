@@ -3,7 +3,7 @@ from lib.pages.base_page import BasePage
 from lib.pages.header_common import HeaderCommon
 # Placeholders for your API/Model logic
 # from lib.api_models.product import ProductAPI
-# from lib.api-models.api_product import GetProductResponse
+# from lib.api_models.api_product import GetProductResponse
 
 class ProductPage(BasePage):
     def __init__(self, page: Page):
