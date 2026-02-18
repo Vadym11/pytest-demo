@@ -2,12 +2,13 @@ version: 2.1
 
 orbs:
   python: circleci/python@2.1.1
-  slack: circleci/slack@4.12.1 # Add the Slack Orb
+  slack: circleci/slack@3.4.2 # Use v3 for Webhook support
 
 jobs:
   run-playwright-tests:
     machine:
-      image: ubuntu-2204:2023.07.2
+      image: ubuntu-2204:current
+      resource_class: large
 
     steps:
       - checkout
@@ -19,8 +20,12 @@ jobs:
           name: Install Playwright & Allure
           command: |
             pip install pytest-playwright allure-pytest
-            playwright install --with-deps chromium
-            sudo npm install -g allure-commandline --unsafe-perm=true
+            playwright install chromium
+            ALLURE_VERSION="2.24.0"
+            curl -L -o allure.tgz "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz"
+            tar -xzf allure.tgz
+            sudo mv allure-${ALLURE_VERSION} /opt/allure
+            sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
       - run:
           name: Run Playwright Tests
@@ -39,21 +44,11 @@ jobs:
           path: allure-report
 
       # Send notification based on job status
-      - slack/notify:
-          event: always # Send on fail and success
-          template: basic_success_1 if "${CIRCLE_JOB_STATUS}" == "success" else basic_fail_1
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Playwright Results:* ${CIRCLE_JOB_STATUS}\n*Branch:* ${CIRCLE_BRANCH}\n\n<https://output.circle-artifacts.com{CIRCLE_WORKFLOW_JOB_ID}/artifacts/0/allure-report/index.html|View Full Allure Report>"
-                  }
-                }
-              ]
-            }
+      - slack/status:
+          fail_only: false
+          webhook: "${SLACK_WEBHOOK}"
+          only_for_branches: main
+          mentions: "here"
 
 workflows:
   playwright-workflow:
